@@ -3,6 +3,7 @@ import { PDSRepository } from '@/repositories/PDSRepository';
 import { PDSValidationService } from '@/services/pdsValidation';
 import { AuthenticatedRequest } from '@/middleware/authMiddleware';
 import { logger } from '@/utils/logger';
+import { auditService } from '@/services/audit';
 
 export class PDSController {
   private pdsRepository: PDSRepository;
@@ -145,6 +146,9 @@ export class PDSController {
 
       const pds = await this.pdsRepository.create(pdsData);
       
+      // Log the creation
+      await auditService.logPDSChange(userId, pds.id, 'create', null, pds, req);
+
       res.status(201).json({
         message: 'PDS record created successfully',
         data: pds
@@ -209,6 +213,9 @@ export class PDSController {
 
       const updatedPds = await this.pdsRepository.update(id, updateData);
       
+      // Log the update
+      await auditService.logPDSChange(userId, id, 'update', existingPds, updatedPds, req);
+
       res.json({
         message: 'PDS record updated successfully',
         data: updatedPds
@@ -245,6 +252,9 @@ export class PDSController {
 
       await this.pdsRepository.delete(id);
       
+      // Log the soft delete
+      await auditService.logPDSChange(userId, id, 'delete', existingPds, null, req);
+
       res.json({
         message: 'PDS record deleted successfully'
       });
@@ -288,6 +298,134 @@ export class PDSController {
       logger.info(`PDS record validated: ${id} by user: ${userId}`);
     } catch (error) {
       logger.error('Validate PDS record error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async batchValidate(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const { pdsIds } = req.body;
+
+      if (!userId) {
+        res.status(401).json({ error: 'User not authenticated' });
+        return;
+      }
+
+      if (!Array.isArray(pdsIds) || pdsIds.length === 0) {
+        res.status(400).json({ error: 'Invalid request: pdsIds must be a non-empty array' });
+        return;
+      }
+
+      if (pdsIds.length > 50) {
+        res.status(400).json({ error: 'Batch size limit exceeded. Maximum 50 PDS records per batch.' });
+        return;
+      }
+
+      const results = [];
+      let validCount = 0;
+      let invalidCount = 0;
+
+      for (const pdsId of pdsIds) {
+        try {
+          const pds = await this.pdsRepository.findById(pdsId);
+          
+          if (!pds || pds.user_id !== userId) {
+            results.push({
+              pdsId,
+              isValid: false,
+              errors: ['PDS record not found or access denied'],
+              processedAt: new Date().toISOString()
+            });
+            invalidCount++;
+            continue;
+          }
+
+          const validationResult = await this.validationService.validatePDS(pds.full_data);
+          const isValid = validationResult.isValid;
+          
+          results.push({
+            pdsId,
+            isValid,
+            errors: validationResult.errors,
+            processedAt: new Date().toISOString()
+          });
+
+          if (isValid) {
+            validCount++;
+          } else {
+            invalidCount++;
+          }
+        } catch (error) {
+          logger.error(`Batch validation error for PDS ${pdsId}:`, error);
+          results.push({
+            pdsId,
+            isValid: false,
+            errors: ['Validation failed due to system error'],
+            processedAt: new Date().toISOString()
+          });
+          invalidCount++;
+        }
+      }
+
+      res.json({
+        totalProcessed: pdsIds.length,
+        validCount,
+        invalidCount,
+        results
+      });
+
+      logger.info(`Batch PDS validation completed: ${pdsIds.length} records processed by user: ${userId}`);
+    } catch (error) {
+      logger.error('Batch validate PDS records error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async restore(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        res.status(401).json({ error: 'User not authenticated' });
+        return;
+      }
+
+      const existingPds = await this.pdsRepository.findDeletedById(id);
+      
+      if (!existingPds) {
+        res.status(404).json({ error: 'Deleted PDS record not found' });
+        return;
+      }
+
+      if (existingPds.user_id !== userId) {
+        res.status(403).json({ error: 'Access denied' });
+        return;
+      }
+
+      const restoredPds = await this.pdsRepository.restore(id);
+      
+      // Log the restore action
+      await auditService.logAction({
+        userId,
+        action: 'restore',
+        entityType: 'pds',
+        entityId: id,
+        details: {
+          title: restoredPds.title,
+          description: restoredPds.description
+        }
+      });
+
+      res.json({
+        message: 'PDS record restored successfully',
+        data: restoredPds
+      });
+
+      logger.info(`PDS record restored: ${id} by user: ${userId}`);
+    } catch (error) {
+      logger.error('Restore PDS record error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

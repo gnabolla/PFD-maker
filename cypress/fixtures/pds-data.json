@@ -1,0 +1,312 @@
+{
+  "validPDS": {
+    "personalInformation": {
+      "surname": "DELA CRUZ",
+      "firstName": "JUAN",
+      "middleName": "SANTOS",
+      "nameExtension": "",
+      "dateOfBirth": "01/15/1990",
+      "placeOfBirth": "Manila",
+      "sex": "Male",
+      "civilStatus": "Single",
+      "civilStatusDetails": "",
+      "citizenship": "Filipino",
+      "height": 175,
+      "weight": 70,
+      "bloodType": "O+",
+      "gsisIdNumber": "1234567890",
+      "pagIbigIdNumber": "1234567890",
+      "philHealthNumber": "12-345678901-2",
+      "sssNumber": "12-3456789-0",
+      "tinNumber": "123-456-789",
+      "agencyEmployeeNumber": "EMP001",
+      "residentialAddress": {
+        "houseBlockLotNumber": "123",
+        "street": "Main Street",
+        "subdivision": "Happy Subdivision",
+        "barangay": "Barangay 1",
+        "cityMunicipality": "Manila",
+        "province": "Metro Manila",
+        "zipCode": "1000"
+      },
+      "permanentAddress": {
+        "houseBlockLotNumber": "123",
+        "street": "Main Street", 
+        "subdivision": "Happy Subdivision",
+        "barangay": "Barangay 1",
+        "cityMunicipality": "Manila",
+        "province": "Metro Manila",
+        "zipCode": "1000"
+      },
+      "telephoneNumber": "02-1234567",
+      "mobileNumber": "09171234567",
+      "emailAddress": "juan@example.com"
+    },
+    "familyBackground": {
+      "spouse": {
+        "surname": "",
+        "firstName": "",
+        "middleName": "",
+        "nameExtension": "",
+        "occupation": "",
+        "employerBusinessName": "",
+        "businessAddress": "",
+        "telephoneNumber": ""
+      },
+      "father": {
+        "surname": "DELA CRUZ",
+        "firstName": "PEDRO",
+        "middleName": "GARCIA",
+        "nameExtension": ""
+      },
+      "mother": {
+        "maidenName": "SANTOS",
+        "surname": "DELA CRUZ",
+        "firstName": "MARIA",
+        "middleName": "REYES"
+      },
+      "children": []
+    },
+    "educationalBackground": {
+      "elementary": {
+        "nameOfSchool": "Manila Elementary School",
+        "basicEducationDegreeCourse": "ELEMENTARY",
+        "periodOfAttendance": {
+          "from": "1996",
+          "to": "2002"
+        },
+        "highestLevelUnitsEarned": "Graduated",
+        "yearGraduated": "2002",
+        "scholarshipAcademicHonorsReceived": ""
+      },
+      "secondary": {
+        "nameOfSchool": "Manila High School",
+        "basicEducationDegreeCourse": "HIGH SCHOOL",
+        "periodOfAttendance": {
+          "from": "2002",
+          "to": "2006"
+        },
+        "highestLevelUnitsEarned": "Graduated",
+        "yearGraduated": "2006",
+        "scholarshipAcademicHonorsReceived": ""
+      },
+      "vocational": {
+        "nameOfSchool": "",
+        "basicEducationDegreeCourse": "",
+        "periodOfAttendance": {
+          "from": "",
+          "to": ""
+        },
+        "highestLevelUnitsEarned": "",
+        "yearGraduated": "",
+        "scholarshipAcademicHonorsReceived": ""
+      },
+      "college": {
+        "nameOfSchool": "University of the Philippines",
+        "basicEducationDegreeCourse": "Bachelor of Science in Computer Science",
+        "periodOfAttendance": {
+          "from": "2006",
+          "to": "2010"
+        },
+        "highestLevelUnitsEarned": "Graduated",
+        "yearGraduated": "2010",
+        "scholarshipAcademicHonorsReceived": "Cum Laude"
+      },
+      "graduate": {
+        "nameOfSchool": "",
+        "basicEducationDegreeCourse": "",
+        "periodOfAttendance": {
+          "from": "",
+          "to": ""
+        },
+        "highestLevelUnitsEarned": "",
+        "yearGraduated": "",
+        "scholarshipAcademicHonorsReceived": ""
+      }
+    },
+    "civilServiceEligibility": [],
+    "workExperience": [],
+    "voluntaryWork": [],
+    "learningAndDevelopment": [],
+    "otherInformation": {
+      "specialSkillsHobbies": ["Programming", "Reading"],
+      "nonAcademicDistinctions": [],
+      "memberships": []
+    },
+    "questionsAnswers": {
+      "question34": {
+        "answer": false,
+        "details": ""
+      },
+      "question35": {
+        "answer": false,
+        "details": ""
+      },
+      "question36": {
+        "answer": false,
+        "details": ""
+      },
+      "question37": {
+        "answer": false,
+        "details": ""
+      },
+      "question38": {
+        "answer": false,
+        "details": ""
+      },
+      "question39": {
+        "answer": false,
+        "details": ""
+      },
+      "question40": {
+        "answer": false,
+        "details": ""
+      }
+    },
+    "references": [
+      {
+        "name": "JOSE, M., RIZAL",
+        "address": "123 Main Street, Manila",
+        "telephoneNumber": "02-1234567"
+      },
+      {
+        "name": "ANDRES, B., BONIFACIO",
+        "address": "456 Second Street, Quezon City",
+        "telephoneNumber": "02-7654321"
+      },
+      {
+        "name": "APOLINARIO, M., MABINI",
+        "address": "789 Third Street, Makati",
+        "telephoneNumber": "02-9876543"
+      }
+    ],
+    "signature": "JUAN S. DELA CRUZ",
+    "dateAccomplished": "01/01/2024",
+    "rightThumbMark": "Thumbmark",
+    "personAdministering": {
+      "name": "",
+      "position": "",
+      "dateOathTaken": ""
+    },
+    "governmentIdType": "Driver's License",
+    "governmentIdNumber": "N01-23-456789",
+    "governmentIdIssuanceDate": "01/01/2023",
+    "governmentIdIssuancePlace": "LTO Manila",
+    "passportSizePhoto": "photo.jpg"
+  },
+  "invalidPDS": {
+    "personalInformation": {
+      "surname": "",
+      "firstName": "",
+      "middleName": "",
+      "dateOfBirth": "1990-01-15",
+      "civilStatus": "Divorced",
+      "emailAddress": "invalid-email",
+      "residentialAddress": {
+        "barangay": "",
+        "cityMunicipality": "",
+        "province": "",
+        "zipCode": ""
+      }
+    },
+    "educationalBackground": {
+      "elementary": {
+        "nameOfSchool": "CSC Elem. School",
+        "basicEducationDegreeCourse": "Elementary"
+      }
+    },
+    "workExperience": [
+      {
+        "positionTitle": "Sr. Manager",
+        "departmentAgencyOfficeCompany": "ABC Corp.",
+        "inclusiveDates": {
+          "from": "2020-01-01",
+          "to": "invalid-date"
+        },
+        "monthlySalary": -5000,
+        "salaryGrade": "15",
+        "statusOfAppointment": "Full-time"
+      }
+    ],
+    "references": [
+      {
+        "name": "Juan Dela Cruz",
+        "address": "",
+        "telephoneNumber": ""
+      }
+    ]
+  },
+  "minimalPDS": {
+    "personalInformation": {
+      "surname": "TEST",
+      "firstName": "USER",
+      "middleName": "MIDDLE",
+      "dateOfBirth": "01/01/1990",
+      "placeOfBirth": "Manila",
+      "sex": "Male",
+      "civilStatus": "Single",
+      "citizenship": "Filipino",
+      "height": 170,
+      "weight": 65,
+      "bloodType": "A+",
+      "residentialAddress": {
+        "barangay": "Barangay 1",
+        "cityMunicipality": "Manila",
+        "province": "Metro Manila",
+        "zipCode": "1000"
+      },
+      "permanentAddress": {
+        "barangay": "Barangay 1", 
+        "cityMunicipality": "Manila",
+        "province": "Metro Manila",
+        "zipCode": "1000"
+      }
+    },
+    "familyBackground": {
+      "father": {
+        "surname": "TEST",
+        "firstName": "FATHER"
+      },
+      "mother": {
+        "maidenName": "MAIDEN",
+        "firstName": "MOTHER"
+      },
+      "children": []
+    },
+    "educationalBackground": {
+      "elementary": {
+        "nameOfSchool": "Basic Elementary School",
+        "basicEducationDegreeCourse": "ELEMENTARY"
+      }
+    },
+    "otherInformation": {
+      "specialSkillsHobbies": ["N/A"]
+    },
+    "questionsAnswers": {
+      "question34": { "answer": false },
+      "question35": { "answer": false },
+      "question36": { "answer": false },
+      "question37": { "answer": false },
+      "question38": { "answer": false },
+      "question39": { "answer": false },
+      "question40": { "answer": false }
+    },
+    "references": [
+      {
+        "name": "REFERENCE, A., ONE",
+        "address": "Address 1",
+        "telephoneNumber": "1234567"
+      },
+      {
+        "name": "REFERENCE, B., TWO",
+        "address": "Address 2",
+        "telephoneNumber": "7654321"
+      },
+      {
+        "name": "REFERENCE, C., THREE",
+        "address": "Address 3",
+        "telephoneNumber": "9876543"
+      }
+    ]
+  }
+}

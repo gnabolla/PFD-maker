@@ -1,0 +1,105 @@
+/* Print-specific styles for PDS */
+@media print {
+  /* Reset page margins */
+  @page {
+    size: letter;
+    margin: 0.5in;
+  }
+
+  /* Hide non-printable elements */
+  .no-print,
+  button,
+  nav,
+  header,
+  footer,
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Remove backgrounds and shadows */
+  * {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Ensure text is black for better readability */
+  body,
+  h1, h2, h3, h4, h5, h6,
+  p, span, div {
+    color: #000 !important;
+  }
+
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse !important;
+  }
+
+  table, th, td {
+    border: 1px solid #000 !important;
+  }
+
+  th, td {
+    padding: 4px 8px !important;
+  }
+
+  /* Forms */
+  input, textarea, select {
+    border: 1px solid #000 !important;
+  }
+
+  /* Links */
+  a, a:visited {
+    text-decoration: underline;
+    color: #000 !important;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* PDS-specific styles */
+  .pds-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .pds-section {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+
+  .pds-section-title {
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+  }
+
+  .pds-field-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .pds-field-value {
+    font-size: 12px;
+    border-bottom: 1px solid #000;
+    min-height: 20px;
+  }
+}

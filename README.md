@@ -70,10 +70,20 @@ npm run dev
 
 ## 📚 Documentation
 
-- [API Documentation](docs/api.md)
-- [Integration Guide](docs/integration.md)
-- [Mobile SDK](docs/mobile-sdk.md)
-- [Contributing Guide](CONTRIBUTING.md)
+### For Users
+- [User Manual](docs/USER_MANUAL.md) - Complete guide for using PDS Maker
+- [Common Errors and Fixes](docs/COMMON_ERRORS.md) - Solutions for formatting issues
+- [FAQ](docs/FAQ.md) - Frequently asked questions
+
+### For Developers
+- [API Integration Guide](docs/API_INTEGRATION.md) - Complete API documentation with examples
+- [Developer Guide](docs/DEVELOPER_GUIDE.md) - Architecture and development setup
+- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
+
+### API Reference
+- [Swagger Documentation](http://localhost:3001/api-docs) - Interactive API documentation (when running locally)
+- [API Examples](examples/) - Code examples in multiple languages
 
 ## 🔧 Development
 

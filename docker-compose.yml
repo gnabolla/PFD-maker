@@ -5,78 +5,125 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: pds_maker
-      POSTGRES_USER: pds_user
-      POSTGRES_PASSWORD: pds_password
+      POSTGRES_DB: ${DB_NAME:-pds_maker}
+      POSTGRES_USER: ${DB_USER:-pds_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pds_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./api/src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./api/src/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pds_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+    networks:
+      - pds-network
 
   # Redis Cache
   redis:
     image: redis:7-alpine
+    command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+    networks:
+      - pds-network
 
   # API Service
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
+      cache_from:
+        - pds-maker/api:latest
+    image: pds-maker/api:latest
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://pds_user:pds_password@postgres:5432/pds_maker
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: postgresql://${DB_USER:-pds_user}:${DB_PASSWORD:-pds_password}@postgres:5432/${DB_NAME:-pds_maker}
       REDIS_URL: redis://redis:6379
-      API_PORT: 3001
-      JWT_SECRET: your-super-secret-jwt-key-here
-      CORS_ORIGIN: http://localhost:3000
+      API_PORT: ${API_PORT:-3001}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-here}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW:-15}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+      UPLOAD_PATH: /app/uploads
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE:-10MB}
     ports:
-      - "3001:3001"
+      - "${API_PORT:-3001}:${API_PORT:-3001}"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./uploads:/app/uploads
+      # Development volumes (uncomment for development)
+      # - ./api/src:/app/src
+      # - ./api/package.json:/app/package.json
+      # - ./api/tsconfig.json:/app/tsconfig.json
     restart: unless-stopped
+    networks:
+      - pds-network
 
   # Web Frontend
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
+      cache_from:
+        - pds-maker/web:latest
+    image: pds-maker/web:latest
     environment:
-      REACT_APP_API_URL: http://localhost:3001
-      REACT_APP_ENVIRONMENT: production
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:3001}
+      REACT_APP_ENVIRONMENT: ${REACT_APP_ENVIRONMENT:-production}
+      PORT: ${WEB_PORT:-3000}
     ports:
-      - "3000:3000"
+      - "${WEB_PORT:-3000}:${WEB_PORT:-3000}"
     depends_on:
       - api
+    volumes:
+      # Development volumes (uncomment for development)
+      # - ./web/src:/app/src
+      # - ./web/public:/app/public
     restart: unless-stopped
+    networks:
+      - pds-network
 
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy (Optional - for production)
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
-      - ./deployment/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./deployment/ssl:/etc/nginx/ssl:ro
+      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deployment/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - api
       - web
     restart: unless-stopped
+    networks:
+      - pds-network
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local
 
 networks:
-  default:
-    name: pds-maker-network
+  pds-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,0 +1,46 @@
+version: '3.8'
+
+# Development overrides for docker-compose.yml
+# This file is automatically loaded by docker-compose in development
+
+services:
+  # API Service development overrides
+  api:
+    build:
+      target: builder  # Use builder stage for development
+    environment:
+      NODE_ENV: development
+    volumes:
+      # Mount source code for hot reloading
+      - ./api/src:/app/src
+      - ./api/package.json:/app/package.json
+      - ./api/tsconfig.json:/app/tsconfig.json
+      - ./api/knexfile.js:/app/knexfile.js
+      # Exclude node_modules
+      - /app/node_modules
+    command: npm run dev
+    # Expose debugger port
+    ports:
+      - "9229:9229"
+
+  # Web Frontend development overrides  
+  web:
+    environment:
+      NODE_ENV: development
+      GENERATE_SOURCEMAP: "true"
+      CHOKIDAR_USEPOLLING: "true"  # For file watching in Docker
+    volumes:
+      # Mount source code for hot reloading
+      - ./web/src:/app/src
+      - ./web/public:/app/public
+      - ./web/package.json:/app/package.json
+      - ./web/tsconfig.json:/app/tsconfig.json
+      # Exclude node_modules
+      - /app/node_modules
+    # Use development server instead of nginx
+    command: npm start
+    
+  # Disable nginx in development
+  nginx:
+    profiles:
+      - production

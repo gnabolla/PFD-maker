@@ -1,0 +1,26 @@
+{
+  "validUser": {
+    "email": "test@example.com",
+    "password": "password123",
+    "firstName": "Test",
+    "lastName": "User"
+  },
+  "newUser": {
+    "email": "newuser@example.com", 
+    "password": "securePassword123",
+    "firstName": "New",
+    "lastName": "User"
+  },
+  "adminUser": {
+    "email": "admin@pds-maker.com",
+    "password": "adminPassword123",
+    "firstName": "Admin",
+    "lastName": "User"
+  },
+  "deactivatedUser": {
+    "email": "deactivated@example.com",
+    "password": "password123",
+    "firstName": "Deactivated",
+    "lastName": "User"
+  }
+}

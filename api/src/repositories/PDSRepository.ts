@@ -61,6 +61,7 @@ export interface PDSRecord {
   full_data?: any;
   created_at: Date;
   updated_at: Date;
+  deleted_at?: Date | null;
 }
 
 export interface CreatePDSData {
@@ -128,12 +129,17 @@ export class PDSRepository {
   }
 
   async findById(id: string): Promise<PDSRecord | null> {
-    const pds = await this.db('pds').where({ id }).first();
+    const pds = await this.db('pds').where({ id }).whereNull('deleted_at').first();
+    return pds || null;
+  }
+
+  async findDeletedById(id: string): Promise<PDSRecord | null> {
+    const pds = await this.db('pds').where({ id }).whereNotNull('deleted_at').first();
     return pds || null;
   }
 
   async findByUserId(userId: string): Promise<PDSRecord[]> {
-    return this.db('pds').where({ user_id: userId }).orderBy('created_at', 'desc');
+    return this.db('pds').where({ user_id: userId }).whereNull('deleted_at').orderBy('created_at', 'desc');
   }
 
   async create(pdsData: CreatePDSData): Promise<PDSRecord> {
@@ -150,15 +156,36 @@ export class PDSRepository {
   }
 
   async delete(id: string): Promise<boolean> {
+    // Soft delete - just set deleted_at timestamp
+    const [pds] = await this.db('pds')
+      .where({ id })
+      .whereNull('deleted_at')
+      .update({ deleted_at: new Date(), updated_at: new Date() })
+      .returning('*');
+    return !!pds;
+  }
+
+  async hardDelete(id: string): Promise<boolean> {
+    // Permanent delete - remove from database
     const deletedCount = await this.db('pds').where({ id }).del();
     return deletedCount > 0;
+  }
+
+  async restore(id: string): Promise<PDSRecord | null> {
+    const [pds] = await this.db('pds')
+      .where({ id })
+      .whereNotNull('deleted_at')
+      .update({ deleted_at: null, updated_at: new Date() })
+      .returning('*');
+    return pds || null;
   }
 
   async findAll(filters: { 
     user_id?: string; 
     status?: string; 
     limit?: number; 
-    offset?: number 
+    offset?: number;
+    includeDeleted?: boolean;
   } = {}): Promise<PDSRecord[]> {
     let query = this.db('pds').select('*');
     
@@ -168,6 +195,11 @@ export class PDSRepository {
     
     if (filters.status) {
       query = query.where({ status: filters.status });
+    }
+    
+    // By default, exclude soft-deleted records
+    if (!filters.includeDeleted) {
+      query = query.whereNull('deleted_at');
     }
     
     if (filters.limit) {
@@ -189,7 +221,7 @@ export class PDSRepository {
     return pds || null;
   }
 
-  async count(filters: { user_id?: string; status?: string } = {}): Promise<number> {
+  async count(filters: { user_id?: string; status?: string; includeDeleted?: boolean } = {}): Promise<number> {
     let query = this.db('pds').count('* as count');
     
     if (filters.user_id) {
@@ -198,6 +230,11 @@ export class PDSRepository {
     
     if (filters.status) {
       query = query.where({ status: filters.status });
+    }
+    
+    // By default, exclude soft-deleted records
+    if (!filters.includeDeleted) {
+      query = query.whereNull('deleted_at');
     }
     
     const result = await query.first();

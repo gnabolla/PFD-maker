@@ -3,10 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import { errorHandler } from '@/middleware/errorHandler';
 import { notFoundHandler } from '@/middleware/notFoundHandler';
@@ -15,6 +16,8 @@ import { validateEnvironment } from '@/utils/environment';
 import { logger } from '@/utils/logger';
 import { connectDatabase } from '@/database/connection';
 import { connectRedis } from '@/database/redis';
+import { addRateLimitHeaders, generalRateLimiter, authRateLimiter, fileOpsRateLimiter } from '@/middleware/rateLimiter';
+import { uploadProgressService } from '@/services/uploadProgress';
 
 // Import routes
 import healthRoutes from '@/routes/health';
@@ -23,6 +26,8 @@ import pdsRoutes from '@/routes/pds';
 import validationRoutes from '@/routes/validation';
 import importRoutes from '@/routes/import';
 import exportRoutes from '@/routes/export';
+import templateRoutes from '@/routes/templates';
+import uploadRoutes from '@/routes/upload';
 
 // Load environment variables
 dotenv.config();
@@ -31,7 +36,17 @@ dotenv.config();
 validateEnvironment();
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    credentials: true
+  }
+});
 const PORT = process.env.API_PORT || 3001;
+
+// Initialize upload progress service with socket.io
+uploadProgressService.setSocketServer(io);
 
 // Security middleware
 app.use(helmet());
@@ -40,15 +55,11 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || '15') * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX || '100'), // limit each IP to 100 requests per windowMs
-  message: {
-    error: 'Too many requests from this IP, please try again later.'
-  }
-});
-app.use('/api/', limiter);
+// Add rate limit headers to all responses
+app.use(addRateLimitHeaders);
+
+// Apply general rate limiting to all API routes
+app.use('/api/', generalRateLimiter);
 
 // General middleware
 app.use(compression());
@@ -93,13 +104,15 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes
+// Routes with specific rate limiters
 app.use('/api/health', healthRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/pds', pdsRoutes);
+app.use('/api/auth', authRateLimiter, authRoutes);
+app.use('/api/pds', pdsRoutes); // PDS routes have their own rate limiting
 app.use('/api/validation', validationRoutes);
-app.use('/api/import', importRoutes);
-app.use('/api/export', exportRoutes);
+app.use('/api/import', fileOpsRateLimiter, importRoutes);
+app.use('/api/export', fileOpsRateLimiter, exportRoutes);
+app.use('/api/templates', templateRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Serve uploaded files
 app.use('/uploads', express.static('uploads'));
@@ -119,10 +132,11 @@ const startServer = async () => {
     await connectRedis();
     logger.info('Connected to Redis cache');
 
-    // Start server
-    app.listen(PORT, () => {
+    // Start server with socket.io
+    httpServer.listen(PORT, () => {
       logger.info(`🚀 PDS Maker API server running on port ${PORT}`);
       logger.info(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
+      logger.info(`🔌 Socket.IO server listening for real-time connections`);
       logger.info(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {

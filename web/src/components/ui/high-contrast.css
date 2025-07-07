@@ -1,0 +1,102 @@
+/* High Contrast Mode Styles */
+.high-contrast {
+  /* Colors */
+  --hc-bg: #000;
+  --hc-fg: #fff;
+  --hc-border: #fff;
+  --hc-focus: #ff0;
+  --hc-error: #ff0;
+  --hc-link: #0ff;
+  --hc-visited: #f0f;
+}
+
+.high-contrast body {
+  background-color: var(--hc-bg) !important;
+  color: var(--hc-fg) !important;
+}
+
+.high-contrast * {
+  border-color: var(--hc-border) !important;
+}
+
+/* Text and backgrounds */
+.high-contrast h1,
+.high-contrast h2,
+.high-contrast h3,
+.high-contrast h4,
+.high-contrast h5,
+.high-contrast h6,
+.high-contrast p,
+.high-contrast span,
+.high-contrast div,
+.high-contrast label {
+  color: var(--hc-fg) !important;
+  background-color: var(--hc-bg) !important;
+}
+
+/* Links */
+.high-contrast a {
+  color: var(--hc-link) !important;
+  text-decoration: underline !important;
+}
+
+.high-contrast a:visited {
+  color: var(--hc-visited) !important;
+}
+
+/* Buttons */
+.high-contrast button,
+.high-contrast [role="button"] {
+  background-color: var(--hc-bg) !important;
+  color: var(--hc-fg) !important;
+  border: 2px solid var(--hc-border) !important;
+}
+
+.high-contrast button:hover,
+.high-contrast [role="button"]:hover {
+  background-color: var(--hc-fg) !important;
+  color: var(--hc-bg) !important;
+}
+
+/* Form elements */
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast select {
+  background-color: var(--hc-bg) !important;
+  color: var(--hc-fg) !important;
+  border: 2px solid var(--hc-border) !important;
+}
+
+/* Focus states */
+.high-contrast *:focus {
+  outline: 3px solid var(--hc-focus) !important;
+  outline-offset: 2px !important;
+}
+
+/* Error states */
+.high-contrast .text-red-600,
+.high-contrast .text-red-500,
+.high-contrast .border-red-300,
+.high-contrast .border-red-500 {
+  color: var(--hc-error) !important;
+  border-color: var(--hc-error) !important;
+}
+
+/* Disabled states */
+.high-contrast [disabled],
+.high-contrast .opacity-50 {
+  opacity: 0.6 !important;
+}
+
+/* Cards and panels */
+.high-contrast .bg-white,
+.high-contrast .bg-gray-50,
+.high-contrast .bg-gray-100 {
+  background-color: var(--hc-bg) !important;
+  border: 1px solid var(--hc-border) !important;
+}
+
+/* Shadows - remove in high contrast */
+.high-contrast * {
+  box-shadow: none !important;
+}

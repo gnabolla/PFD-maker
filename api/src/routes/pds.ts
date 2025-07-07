@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { PDSController } from '@/controllers/pdsController';
 import { authenticateToken } from '@/middleware/authMiddleware';
-import { validateRequest, createPDSSchema, updatePDSSchema } from '@/middleware/validation';
+import { validateRequest, createPDSSchema, updatePDSSchema, batchValidateSchema } from '@/middleware/validation';
+import { batchRateLimiter, pdsRateLimiter } from '@/middleware/rateLimiter';
 
 const router = Router();
 const pdsController = new PDSController();
@@ -193,6 +194,90 @@ router.delete('/:id', authenticateToken, pdsController.delete.bind(pdsController
  *       401:
  *         description: Unauthorized
  */
-router.post('/:id/validate', authenticateToken, pdsController.validate.bind(pdsController));
+router.post('/:id/validate', authenticateToken, pdsRateLimiter, pdsController.validate.bind(pdsController));
+
+/**
+ * @swagger
+ * /pds/batch/validate:
+ *   post:
+ *     summary: Validate multiple PDS records in batch
+ *     tags: [PDS]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pdsIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Array of PDS IDs to validate
+ *                 maxItems: 50
+ *     responses:
+ *       200:
+ *         description: Batch validation results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalProcessed:
+ *                   type: number
+ *                 validCount:
+ *                   type: number
+ *                 invalidCount:
+ *                   type: number
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       pdsId:
+ *                         type: string
+ *                       isValid:
+ *                         type: boolean
+ *                       errors:
+ *                         type: array
+ *                       processedAt:
+ *                         type: string
+ *       400:
+ *         description: Invalid request
+ *       401:
+ *         description: Unauthorized
+ *       429:
+ *         description: Too many requests
+ */
+router.post('/batch/validate', authenticateToken, batchRateLimiter, validateRequest(batchValidateSchema), pdsController.batchValidate.bind(pdsController));
+
+/**
+ * @swagger
+ * /pds/{id}/restore:
+ *   post:
+ *     summary: Restore a soft-deleted PDS record
+ *     tags: [PDS]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: PDS record restored
+ *       404:
+ *         description: PDS record not found
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/:id/restore', authenticateToken, pdsRateLimiter, pdsController.restore.bind(pdsController));
+
+// Apply rate limiting to all PDS routes
+router.use(pdsRateLimiter);
 
 export default router;

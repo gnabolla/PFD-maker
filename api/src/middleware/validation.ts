@@ -296,3 +296,17 @@ export const updatePDSSchema = createPDSSchema.fork(
   ['title', 'surname', 'firstName', 'middleName', 'dateOfBirth', 'placeOfBirth', 'civilStatus', 'height', 'weight', 'bloodType', 'citizenship', 'residentialAddress', 'permanentAddress', 'father', 'mother'],
   (schema) => schema.optional()
 );
+
+// Batch validation schema
+export const batchValidateSchema = Joi.object({
+  pdsIds: Joi.array()
+    .items(Joi.string().uuid())
+    .min(1)
+    .max(50)
+    .required()
+    .messages({
+      'array.min': 'At least one PDS ID is required',
+      'array.max': 'Maximum 50 PDS records can be validated at once',
+      'any.required': 'PDS IDs array is required'
+    })
+});
