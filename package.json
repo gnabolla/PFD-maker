@@ -1,0 +1,58 @@
+{
+  "name": "pds-maker",
+  "version": "1.0.0",
+  "description": "Open Source Philippine Government PDS Platform with API-first architecture",
+  "main": "api/src/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run api:dev\" \"npm run web:dev\"",
+    "api:dev": "cd api && npm run dev",
+    "web:dev": "cd web && npm run dev",
+    "build": "npm run api:build && npm run web:build",
+    "api:build": "cd api && npm run build",
+    "web:build": "cd web && npm run build",
+    "test": "npm run api:test && npm run web:test",
+    "api:test": "cd api && npm test",
+    "web:test": "cd web && npm test",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "postinstall": "npm run install:api && npm run install:web",
+    "install:api": "cd api && npm install",
+    "install:web": "cd web && npm install",
+    "docker:build": "docker build -t pds-maker .",
+    "docker:run": "docker-compose up"
+  },
+  "keywords": [
+    "pds",
+    "philippines",
+    "government",
+    "civil-service",
+    "api",
+    "automation",
+    "formatting"
+  ],
+  "author": "PDS Maker Community",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/pds-maker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/pds-maker/issues"
+  },
+  "homepage": "https://github.com/your-org/pds-maker#readme",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
